@@ -2,9 +2,9 @@ import Game from '@/components/Game';
 
 export default function Home() {
   return (
-    <main>
-      <h1 className="text-center text-3xl font-bold mt-6">Ethos tower</h1>
+    <div>
+      <h1>Ethos Tower</h1>
       <Game />
-    </main>
+    </div>
   );
 }
