@@ -30,6 +30,16 @@ const Game = () => {
 
       if (keys['ArrowLeft']) player.x -= 5;
       if (keys['ArrowRight']) player.x += 5;
+ // En üst platformun konumunu kontrol et
+const topPlatformY = Math.min(...platforms.map(p => p.y));
+if (topPlatformY > 0) {
+  platforms.push({
+    x: Math.random() * 300,
+    y: topPlatformY - 60,
+    width: 100,
+    height: 10,
+  });
+}
 
       // Jump
       for (let plat of platforms) {
