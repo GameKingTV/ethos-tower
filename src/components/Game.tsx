@@ -14,7 +14,7 @@ const Game = () => {
     canvas.height = 600;
 
     let player = { x: 180, y: 500, vy: 0, width: 20, height: 20 };
-    let gravity = 0.15;
+    let gravity = 0.5;
     let keys: { [key: string]: boolean } = {};
     let platforms = Array.from({ length: 10 }, (_, i) => ({
       x: Math.random() * 350,
@@ -49,7 +49,7 @@ if (topPlatformY > 0) {
           player.x + player.width > plat.x &&
           player.x < plat.x + plat.width
         ) {
-          player.vy = -2;
+          player.vy = -10;
         }
       }
 
