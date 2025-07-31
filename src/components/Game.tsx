@@ -13,21 +13,23 @@ const Game = () => {
     canvas.width = 1200;
     canvas.height = 800;
 
-    let gravity = 0.12;
+    let player = { x: 600, y: 500, vy: 0, width: 50, height: 50 };
+    let gravity = 0.2;
     let keys: { [key: string]: boolean } = {};
+    let score = 0;
 
-    // Başlangıçta ortalanmış oyuncu
-    let player = { x: canvas.width / 2 - 10, y: 500, vy: 0, width: 20, height: 20 };
-
-    // Geniş alana yayılmış platform üretimi
-    let platforms = Array.from({ length: 15 }, (_, i) => ({
-      x: Math.random() * (canvas.width - 150),
-      y: canvas.height - i * 80,
+    let platforms = Array.from({ length: 10 }, (_, i) => ({
+      x: Math.random() * (canvas.width - 120),
+      y: 800 - i * 80,
       width: 120,
-      height: 10,
+      height: 20,
     }));
 
-    let score = 0;
+    const playerImg = new Image();
+    playerImg.src = '/player.png';
+
+    const platformImg = new Image();
+    platformImg.src = '/platform.png';
 
     const update = () => {
       player.vy += gravity;
@@ -36,18 +38,18 @@ const Game = () => {
       if (keys['ArrowLeft']) player.x -= 5;
       if (keys['ArrowRight']) player.x += 5;
 
-      // Sonsuz platform üretimi
-      const topPlatformY = Math.min(...platforms.map(p => p.y));
-      if (topPlatformY > 0) {
+      // Yeni platform üret
+      const topY = Math.min(...platforms.map(p => p.y));
+      if (topY > 0) {
         platforms.push({
-          x: Math.random() * (canvas.width - 150),
-          y: topPlatformY - 80,
+          x: Math.random() * (canvas.width - 120),
+          y: topY - 80,
           width: 120,
-          height: 10,
+          height: 20,
         });
       }
 
-      // Platformla çarpışma (zıplama)
+      // Zıplama kontrolü
       for (let plat of platforms) {
         if (
           player.y + player.height < plat.y + player.vy &&
@@ -55,48 +57,51 @@ const Game = () => {
           player.x + player.width > plat.x &&
           player.x < plat.x + plat.width
         ) {
-          player.vy = -8;
+          player.vy = -9;
         }
       }
 
-      // Yukarı çıktıysa platformları kaydır
+      // Ekranı yukarı kaydır
       if (player.y < 300) {
-        let dy = 300 - player.y;
+        const dy = 300 - player.y;
         player.y = 300;
         platforms.forEach(p => (p.y += dy));
         score += Math.floor(dy);
       }
 
-      // Aşağı düşerse sıfırla
+      // Düşerse resetle
       if (player.y > canvas.height) {
-        player.x = canvas.width / 2 - 10;
-        player.y = 500;
-        player.vy = 0;
+        player = { x: 600, y: 500, vy: 0, width: 50, height: 50 };
         score = 0;
-        platforms = Array.from({ length: 15 }, (_, i) => ({
-          x: Math.random() * (canvas.width - 150),
-          y: canvas.height - i * 80,
+        platforms = Array.from({ length: 10 }, (_, i) => ({
+          x: Math.random() * (canvas.width - 120),
+          y: 800 - i * 80,
           width: 120,
-          height: 10,
+          height: 20,
         }));
       }
-
-      // Alt platformları temizle
-      platforms = platforms.filter(p => p.y < canvas.height + 50);
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Oyuncu
-      ctx.fillStyle = 'black';
-      ctx.fillRect(player.x, player.y, player.width, player.height);
-
       // Platformlar
-      ctx.fillStyle = 'green';
       platforms.forEach(p => {
-        ctx.fillRect(p.x, p.y, p.width, p.height);
+        if (platformImg.complete) {
+          ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
+        } else {
+          ctx.fillStyle = 'green';
+          ctx.fillRect(p.x, p.y, p.width, p.height);
+        }
       });
+
+      // Karakter
+      if (playerImg.complete) {
+        ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+      } else {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+      }
 
       // Skor
       ctx.fillStyle = 'blue';
@@ -127,7 +132,7 @@ const Game = () => {
     <canvas
       ref={canvasRef}
       style={{
-        border: '1px solid black',
+        border: '2px solid #444',
         display: 'block',
         margin: '20px auto',
         background: '#f0f0f0',
