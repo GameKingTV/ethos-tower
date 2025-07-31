@@ -49,7 +49,7 @@ if (topPlatformY > 0) {
           player.x + player.width > plat.x &&
           player.x < plat.x + plat.width
         ) {
-          player.vy = -6;
+          player.vy = -30;
         }
       }
 
