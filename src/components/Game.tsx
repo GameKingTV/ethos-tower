@@ -13,7 +13,7 @@ const Game = () => {
     canvas.width = 1200;
     canvas.height = 800;
 
-    let player = { x: 180, y: 500, vy: 0, width: 20, height: 20 };
+    let player = { x: 1000, y: 360, vy: 0, width: 20, height: 20 };
     let gravity = 0.12;
     let keys: { [key: string]: boolean } = {};
     let platforms = Array.from({ length: 10 }, (_, i) => ({
