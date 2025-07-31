@@ -18,7 +18,7 @@ const Game = () => {
     let keys: { [key: string]: boolean } = {};
     let platforms = Array.from({ length: 10 }, (_, i) => ({
       x: Math.random() * 350,
-      y: 600 - i * 60,
+      y: 1200 - i * 60,
       width: 100,
       height: 10,
     }));
