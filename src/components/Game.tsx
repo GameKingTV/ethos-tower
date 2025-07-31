@@ -13,15 +13,20 @@ const Game = () => {
     canvas.width = 1200;
     canvas.height = 800;
 
-    let player = { x: 1000, y: 360, vy: 0, width: 20, height: 20 };
     let gravity = 0.12;
     let keys: { [key: string]: boolean } = {};
-    let platforms = Array.from({ length: 10 }, (_, i) => ({
-      x: Math.random() * 700,
-      y: 1200 - i * 120,
+
+    // Başlangıçta ortalanmış oyuncu
+    let player = { x: canvas.width / 2 - 10, y: 500, vy: 0, width: 20, height: 20 };
+
+    // Geniş alana yayılmış platform üretimi
+    let platforms = Array.from({ length: 15 }, (_, i) => ({
+      x: Math.random() * (canvas.width - 150),
+      y: canvas.height - i * 80,
       width: 120,
       height: 10,
     }));
+
     let score = 0;
 
     const update = () => {
@@ -30,18 +35,19 @@ const Game = () => {
 
       if (keys['ArrowLeft']) player.x -= 5;
       if (keys['ArrowRight']) player.x += 5;
- // En üst platformun konumunu kontrol et
-const topPlatformY = Math.min(...platforms.map(p => p.y));
-if (topPlatformY > 0) {
-  platforms.push({
-    x: Math.random() * 300,
-    y: topPlatformY - 60,
-    width: 100,
-    height: 10,
-  });
-}
 
-      // Jump
+      // Sonsuz platform üretimi
+      const topPlatformY = Math.min(...platforms.map(p => p.y));
+      if (topPlatformY > 0) {
+        platforms.push({
+          x: Math.random() * (canvas.width - 150),
+          y: topPlatformY - 80,
+          width: 120,
+          height: 10,
+        });
+      }
+
+      // Platformla çarpışma (zıplama)
       for (let plat of platforms) {
         if (
           player.y + player.height < plat.y + player.vy &&
@@ -53,7 +59,7 @@ if (topPlatformY > 0) {
         }
       }
 
-      // Scroll platforms
+      // Yukarı çıktıysa platformları kaydır
       if (player.y < 300) {
         let dy = 300 - player.y;
         player.y = 300;
@@ -61,31 +67,38 @@ if (topPlatformY > 0) {
         score += Math.floor(dy);
       }
 
-      // Respawn if fall
+      // Aşağı düşerse sıfırla
       if (player.y > canvas.height) {
+        player.x = canvas.width / 2 - 10;
         player.y = 500;
         player.vy = 0;
         score = 0;
-        platforms = Array.from({ length: 10 }, (_, i) => ({
-          x: Math.random() * 350,
-          y: 600 - i * 60,
-          width: 100,
+        platforms = Array.from({ length: 15 }, (_, i) => ({
+          x: Math.random() * (canvas.width - 150),
+          y: canvas.height - i * 80,
+          width: 120,
           height: 10,
         }));
       }
+
+      // Alt platformları temizle
+      platforms = platforms.filter(p => p.y < canvas.height + 50);
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Oyuncu
       ctx.fillStyle = 'black';
       ctx.fillRect(player.x, player.y, player.width, player.height);
 
+      // Platformlar
       ctx.fillStyle = 'green';
       platforms.forEach(p => {
         ctx.fillRect(p.x, p.y, p.width, p.height);
       });
 
+      // Skor
       ctx.fillStyle = 'blue';
       ctx.font = '20px Arial';
       ctx.fillText(`Score: ${score}`, 10, 30);
@@ -110,7 +123,17 @@ if (topPlatformY > 0) {
     };
   }, []);
 
-  return <canvas ref={canvasRef} style={{ border: '1px solid black', display: 'block', margin: '20px auto' }} />;
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        border: '1px solid black',
+        display: 'block',
+        margin: '20px auto',
+        background: '#f0f0f0',
+      }}
+    />
+  );
 };
 
 export default Game;
