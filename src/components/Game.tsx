@@ -1,38 +1,48 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const Game = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [player, setPlayer] = useState({ x: 100, y: 300, vy: 0 });
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
-    canvas.width = 400;
-    canvas.height = 600;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
 
-    let y = 550;
-    let vy = 0;
+    let animationId: number;
     let gravity = 0.5;
+    let keys: any = {};
 
-    function draw() {
+    const loop = () => {
+      if (!ctx || !canvas) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      vy += gravity;
-      y += vy;
 
-      if (y > canvas.height - 50) {
-        y = canvas.height - 50;
-        vy = -10;
-      }
+      // Gravity
+      let newY = player.y + player.vy;
+      let newVy = player.vy + gravity;
 
-      ctx.fillStyle = "blue";
-      ctx.fillRect(180, y, 40, 40);
+      // Simple control
+      if (keys["ArrowLeft"]) player.x -= 5;
+      if (keys["ArrowRight"]) player.x += 5;
 
-      requestAnimationFrame(draw);
-    }
+      // Draw player
+      ctx.fillStyle = 'black';
+      ctx.fillRect(player.x, newY, 20, 20);
 
-    draw();
-  }, []);
+      setPlayer({ x: player.x, y: newY, vy: newVy });
 
-  return <canvas ref={canvasRef} className="border mx-auto block mt-10" />;
+      animationId = requestAnimationFrame(loop);
+    };
+
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+
+    loop();
+
+    return () => cancelAnimationFrame(animationId);
+  }, [player]);
+
+  return <canvas ref={canvasRef} width={400} height={600} />;
 };
 
 export default Game;
