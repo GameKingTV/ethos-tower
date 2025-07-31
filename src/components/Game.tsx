@@ -10,8 +10,8 @@ const Game = () => {
 
     if (!canvas || !ctx) return;
 
-    canvas.width = 400;
-    canvas.height = 600;
+    canvas.width = 800;
+    canvas.height = 1200;
 
     let player = { x: 180, y: 500, vy: 0, width: 20, height: 20 };
     let gravity = 0.22;
@@ -36,7 +36,7 @@ if (topPlatformY > 0) {
   platforms.push({
     x: Math.random() * 300,
     y: topPlatformY - 60,
-    width: 100,
+    width: 120,
     height: 10,
   });
 }
