@@ -36,7 +36,7 @@ if (topPlatformY > 0) {
   platforms.push({
     x: Math.random() * 300,
     y: topPlatformY - 60,
-    width: 120,
+    width: 100,
     height: 10,
   });
 }
