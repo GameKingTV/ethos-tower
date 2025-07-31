@@ -17,9 +17,9 @@ const Game = () => {
     let gravity = 0.12;
     let keys: { [key: string]: boolean } = {};
     let platforms = Array.from({ length: 10 }, (_, i) => ({
-      x: Math.random() * 350,
-      y: 1200 - i * 60,
-      width: 100,
+      x: Math.random() * 700,
+      y: 1200 - i * 120,
+      width: 120,
       height: 10,
     }));
     let score = 0;
