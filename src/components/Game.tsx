@@ -11,7 +11,6 @@ export default function Game({ twitterID }: GameProps) {
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [highScores, setHighScores] = useState<{ name: string; score: number }[]>([]);
-  const [restartTrigger, setRestartTrigger] = useState(0); // yeniden başlatma tetikleyici
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -26,35 +25,34 @@ export default function Game({ twitterID }: GameProps) {
     playerImg.src = '/player.png';
     platformImg.src = '/platform.png';
 
-    let animationFrameId: number;
-    let player: any;
-    let gravity = 0.26;
-    let keys: { [key: string]: boolean } = {};
-    let platforms: any[] = [];
+    let loadedCount = 0;
+    const onAssetLoad = () => {
+      loadedCount++;
+      if (loadedCount === 2) startGame();
+    };
 
-    let localScore = 0;
+    playerImg.onload = onAssetLoad;
+    platformImg.onload = onAssetLoad;
 
-    const resetGame = () => {
-      player = {
+    const startGame = () => {
+      let player = {
         x: 100,
         y: 400,
         vy: 0,
         width: canvas.width * 0.06,
-        height: canvas.width * 0.06
+        height: canvas.width * 0.06,
       };
 
-      platforms = Array.from({ length: 10 }, (_, i) => ({
+      let gravity = 0.26;
+      let keys: { [key: string]: boolean } = {};
+      let platforms = Array.from({ length: 10 }, (_, i) => ({
         x: Math.random() * (canvas.width - 200),
         y: canvas.height - i * 100,
-        width: canvas.width * 0.30,
-        height: canvas.height * 0.05
+        width: canvas.width * 0.3,
+        height: canvas.height * 0.05,
       }));
 
-      localScore = 0;
-    };
-
-    const startGame = () => {
-      resetGame();
+      let localScore = 0;
 
       const update = () => {
         player.vy += gravity;
@@ -79,13 +77,10 @@ export default function Game({ twitterID }: GameProps) {
           player.y = 300;
           platforms.forEach(p => (p.y += dy));
           localScore += Math.floor(dy);
-          setScore(localScore);
         }
 
         if (player.y > canvas.height) {
           handleGameOver(localScore);
-          cancelAnimationFrame(animationFrameId);
-          return;
         }
 
         const topY = Math.min(...platforms.map(p => p.y));
@@ -94,14 +89,16 @@ export default function Game({ twitterID }: GameProps) {
             x: Math.random() * (canvas.width - 200),
             y: topY - 100,
             width: 200,
-            height: 40
+            height: 40,
           });
         }
       };
 
       const draw = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+
         platforms.forEach(p => {
           ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
         });
@@ -112,53 +109,37 @@ export default function Game({ twitterID }: GameProps) {
       };
 
       const loop = () => {
-        update();
-        draw();
-        animationFrameId = requestAnimationFrame(loop);
+        if (!isGameOver) {
+          update();
+          draw();
+          requestAnimationFrame(loop);
+        }
       };
 
       loop();
+
+      window.addEventListener('keydown', e => (keys[e.key] = true));
+      window.addEventListener('keyup', e => (keys[e.key] = false));
     };
-
-    const onAssetLoad = (() => {
-      let loaded = 0;
-      return () => {
-        loaded++;
-        if (loaded === 2) startGame();
-      };
-    })();
-
-    playerImg.onload = onAssetLoad;
-    platformImg.onload = onAssetLoad;
-
-    const keyDown = (e: KeyboardEvent) => (keys[e.key] = true);
-    const keyUp = (e: KeyboardEvent) => (keys[e.key] = false);
-    window.addEventListener('keydown', keyDown);
-    window.addEventListener('keyup', keyUp);
-
-    return () => {
-      window.removeEventListener('keydown', keyDown);
-      window.removeEventListener('keyup', keyUp);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [restartTrigger]);
+  }, [isGameOver]);
 
   const handleGameOver = (finalScore: number) => {
     setIsGameOver(true);
+    setScore(finalScore);
 
     const newScore = { name: twitterID, score: finalScore };
     const storedScores = JSON.parse(localStorage.getItem("leaderboard") || "[]");
     const updatedScores = [...storedScores, newScore]
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
+
     localStorage.setItem("leaderboard", JSON.stringify(updatedScores));
     setHighScores(updatedScores);
   };
 
   const handleRestart = () => {
-    setScore(0);
     setIsGameOver(false);
-    setRestartTrigger(prev => prev + 1); // useEffect'i tetiklemek için
+    setScore(0);
   };
 
   return (
@@ -172,12 +153,13 @@ export default function Game({ twitterID }: GameProps) {
           margin: '20px auto',
         }}
       />
-      <div className="absolute top-4 left-4 text-xl font-bold text-black">
+
+      <div className="absolute top-4 left-4 text-xl font-bold">
         Score: {score}
       </div>
 
       {isGameOver && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 text-white z-50">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 text-white">
           <h2 className="text-4xl font-bold mb-4">Game Over</h2>
           <p className="mb-4">Your Score: {score}</p>
 
