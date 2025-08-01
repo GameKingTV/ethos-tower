@@ -33,8 +33,9 @@ const Game = () => {
       x: 100,
       y: 400,
       vy: 0,
-      width: 100,  // Eski: 60
-      height: 80  // Eski: 60
+      width: canvas.width * 0.06,
+      height: canvas.width * 0.06
+
 };
 
       let gravity = 0.3;
@@ -42,8 +43,9 @@ const Game = () => {
       let platforms = Array.from({ length: 10 }, (_, i) => ({
   x: Math.random() * (canvas.width - 200), // genişliğe göre ayarla
   y: canvas.height - i * 100,
-  width: 200,  // Eski: 150
-  height: 40   // Eski: 30
+  width: canvas.width * 0.25,
+height: canvas.height * 0.03
+
 }));
 
       let score = 0;
