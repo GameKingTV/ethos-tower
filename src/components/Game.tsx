@@ -35,21 +35,21 @@ const Game = ({ twitterID }: GameProps) => {
 
     const startGame = () => {
       let player = {
-        x: 100,
-        y: 400,
-        vy: 0,
-        width: canvas.width * 0.06,
-        height: canvas.width * 0.06,
-      };
+  x: platforms[0].x + platforms[0].width / 2 - (canvas.width * 0.06) / 2,
+  y: platforms[0].y - (canvas.width * 0.06),
+  vy: 0,
+  width: canvas.width * 0.06,
+  height: canvas.width * 0.06,
+};
 
       let gravity = 0.26;
       let keys: { [key: string]: boolean } = {};
       let platforms = Array.from({ length: 10 }, (_, i) => ({
-        x: Math.random() * (canvas.width - 200),
-        y: canvas.height - i * 100,
-        width: canvas.width * 0.3,
-        height: canvas.height * 0.05,
-      }));
+  x: Math.random() * (canvas.width - canvas.width * 0.30),
+  y: canvas.height - i * 100,
+  width: canvas.width * 0.30,
+  height: canvas.height * 0.05,
+}));
 
       let currentScore = 0;
 
