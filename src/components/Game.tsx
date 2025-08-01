@@ -88,11 +88,12 @@ const Game = () => {
         const topY = Math.min(...platforms.map(p => p.y));
         if (topY > 0) {
           platforms.push({
-            x: Math.random() * 1000,
-            y: topY - 80,
-            width: 150,
-            height: 30,
-          });
+  x: Math.random() * (canvas.width - 200),
+  y: topY - 100,
+  width: 200,
+  height: 40
+});
+
         }
       };
 
