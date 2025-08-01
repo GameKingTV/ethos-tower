@@ -28,7 +28,7 @@ const Game = () => {
     platformImg.onload = onAssetLoad;
 
     const startGame = () => {
-      let player = { x: 100, y: 400, vy: 0, width: 60, height: 60 };
+      let player = { x: 100, y: 400, vy: 0, width: 90, height: 70 };
       let gravity = 0.3;
       let keys: { [key: string]: boolean } = {};
       let platforms = Array.from({ length: 10 }, (_, i) => ({
