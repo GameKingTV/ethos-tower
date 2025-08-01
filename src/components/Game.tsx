@@ -9,8 +9,9 @@ const Game = () => {
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    canvas.width = 1200;
-    canvas.height = 800;
+    canvas.width = window.innerWidth * 0.9;
+    canvas.height = window.innerHeight * 0.85;
+
 
     const playerImg = new Image();
     const platformImg = new Image();
@@ -28,15 +29,23 @@ const Game = () => {
     platformImg.onload = onAssetLoad;
 
     const startGame = () => {
-      let player = { x: 100, y: 400, vy: 0, width: 90, height: 70 };
+      let player = {
+      x: 100,
+      y: 400,
+      vy: 0,
+      width: 100,  // Eski: 60
+      height: 80  // Eski: 60
+};
+
       let gravity = 0.3;
       let keys: { [key: string]: boolean } = {};
       let platforms = Array.from({ length: 10 }, (_, i) => ({
-        x: Math.random() * 1000,
-        y: 800 - i * 80,
-        width: 150,
-        height: 30,
-      }));
+  x: Math.random() * (canvas.width - 200), // genişliğe göre ayarla
+  y: canvas.height - i * 100,
+  width: 200,  // Eski: 150
+  height: 40   // Eski: 30
+}));
+
       let score = 0;
 
       const update = () => {
