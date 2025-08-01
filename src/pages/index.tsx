@@ -1,18 +1,10 @@
+'use client';
+
+import { useState } from 'react';
 import Game from '@/components/Game';
 
 export default function Home() {
-  return (
-    <div>
-      <h1>Ethos Tower</h1>
-      <Game />
-    </div>
-  );
-}
-import { useState } from "react";
-import Game from "../components/Game";
-
-export default function HomePage() {
-  const [twitterID, setTwitterID] = useState("");
+  const [twitterID, setTwitterID] = useState('');
   const [startGame, setStartGame] = useState(false);
 
   return (
