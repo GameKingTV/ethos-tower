@@ -1,12 +1,11 @@
 'use client';
-
 import { useEffect, useRef, useState } from 'react';
 
 interface GameProps {
   twitterID: string;
 }
 
-export default function Game({ twitterID }: GameProps) {
+const Game = ({ twitterID }: GameProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -52,7 +51,7 @@ export default function Game({ twitterID }: GameProps) {
         height: canvas.height * 0.05,
       }));
 
-      let localScore = 0;
+      let currentScore = 0;
 
       const update = () => {
         player.vy += gravity;
@@ -76,11 +75,13 @@ export default function Game({ twitterID }: GameProps) {
           const dy = 300 - player.y;
           player.y = 300;
           platforms.forEach(p => (p.y += dy));
-          localScore += Math.floor(dy);
+          currentScore += Math.floor(dy);
+          setScore(currentScore);
         }
 
         if (player.y > canvas.height) {
-          handleGameOver(localScore);
+          handleGameOver(currentScore);
+          return;
         }
 
         const topY = Math.min(...platforms.map(p => p.y));
@@ -96,16 +97,14 @@ export default function Game({ twitterID }: GameProps) {
 
       const draw = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
-
         platforms.forEach(p => {
           ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
         });
 
         ctx.fillStyle = 'blue';
         ctx.font = '20px Arial';
-        ctx.fillText(`Score: ${localScore}`, 20, 30);
+        ctx.fillText(`Score: ${currentScore}`, 20, 30);
       };
 
       const loop = () => {
@@ -121,25 +120,23 @@ export default function Game({ twitterID }: GameProps) {
       window.addEventListener('keydown', e => (keys[e.key] = true));
       window.addEventListener('keyup', e => (keys[e.key] = false));
     };
-  }, [isGameOver]);
+  }, []);
 
   const handleGameOver = (finalScore: number) => {
     setIsGameOver(true);
-    setScore(finalScore);
-
     const newScore = { name: twitterID, score: finalScore };
-    const storedScores = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+    const storedScores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
     const updatedScores = [...storedScores, newScore]
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
-
-    localStorage.setItem("leaderboard", JSON.stringify(updatedScores));
+    localStorage.setItem('leaderboard', JSON.stringify(updatedScores));
     setHighScores(updatedScores);
   };
 
   const handleRestart = () => {
-    setIsGameOver(false);
     setScore(0);
+    setIsGameOver(false);
+    window.location.reload(); // oyunu basitçe yeniden başlat
   };
 
   return (
@@ -154,9 +151,7 @@ export default function Game({ twitterID }: GameProps) {
         }}
       />
 
-      <div className="absolute top-4 left-4 text-xl font-bold">
-        Score: {score}
-      </div>
+      <div className="absolute top-4 left-4 text-xl font-bold">Score: {score}</div>
 
       {isGameOver && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 text-white">
@@ -182,4 +177,6 @@ export default function Game({ twitterID }: GameProps) {
       )}
     </div>
   );
-}
+};
+
+export default Game;
