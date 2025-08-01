@@ -7,6 +7,9 @@ const Game = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
+    const backgroundImg = new Image();
+backgroundImg.src = '/background.png';
+
     if (!canvas || !ctx) return;
 
     canvas.width = window.innerWidth * 0.9;
@@ -20,13 +23,15 @@ const Game = () => {
 
     // Oyunu sadece görseller yüklendiğinde başlat
     let loadedCount = 0;
-    const onAssetLoad = () => {
-      loadedCount++;
-      if (loadedCount === 2) startGame(); // her iki görsel yüklendiğinde başlat
-    };
+const onAssetLoad = () => {
+  loadedCount++;
+  if (loadedCount === 3) startGame(); // arka plan dahil
+};
 
-    playerImg.onload = onAssetLoad;
-    platformImg.onload = onAssetLoad;
+playerImg.onload = onAssetLoad;
+platformImg.onload = onAssetLoad;
+backgroundImg.onload = onAssetLoad;
+
 
     const startGame = () => {
       let player = {
@@ -100,18 +105,22 @@ height: canvas.height * 0.05
       };
 
       const draw = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Önce arka planı çiz
+  ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
 
-        ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+  // Oyuncuyu ve platformları çiz
+  ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
 
-        platforms.forEach(p => {
-          ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
-        });
+  platforms.forEach(p => {
+    ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
+  });
 
-        ctx.fillStyle = 'blue';
-        ctx.font = '20px Arial';
-        ctx.fillText(`Score: ${score}`, 20, 30);
-      };
+  // Skoru yaz
+  ctx.fillStyle = 'blue';
+  ctx.font = '20px Arial';
+  ctx.fillText(`Score: ${score}`, 20, 30);
+};
+
 
       const loop = () => {
         update();
@@ -126,7 +135,8 @@ height: canvas.height * 0.05
     };
   }, []);
 
-  return <canvas ref={canvasRef} style={{ background: '#eee', border: '1px solid black', display: 'block', margin: '20px auto' }} />;
+ return <canvas ref={canvasRef} style={{ display: 'block', margin: '20px auto' }} />;
+
 };
 
 export default Game;
