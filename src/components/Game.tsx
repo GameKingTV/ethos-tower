@@ -1,113 +1,132 @@
 'use client';
 import { useEffect, useRef } from 'react';
 
-interface Props {
-  twitterID: string;
-}
-
-const Game: React.FC<Props> = ({ twitterID }) => {
+const Game = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d')!;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
 
-    const gravity = 0.4;
-    const jumpPower = -10;
+    canvas.width = window.innerWidth * 0.9;
+    canvas.height = window.innerHeight * 0.85;
+
 
     const playerImg = new Image();
-    playerImg.src = '/player.png';
-
     const platformImg = new Image();
+    playerImg.src = '/player.png';
     platformImg.src = '/platform.png';
 
-    const player = {
-      x: canvas.width / 2 - 25,
-      y: canvas.height - 150,
-      width: 50,
-      height: 50,
+    // Oyunu sadece görseller yüklendiğinde başlat
+    let loadedCount = 0;
+    const onAssetLoad = () => {
+      loadedCount++;
+      if (loadedCount === 2) startGame(); // her iki görsel yüklendiğinde başlat
+    };
+
+    playerImg.onload = onAssetLoad;
+    platformImg.onload = onAssetLoad;
+
+    const startGame = () => {
+      let player = {
+      x: 100,
+      y: 400,
       vy: 0,
-    };
+      width: canvas.width * 0.06,
+      height: canvas.width * 0.06
 
-    const platformCount = 10;
-    const platforms = Array.from({ length: platformCount }).map((_, i) => ({
-      x: Math.random() * (canvas.width - 100),
-      y: canvas.height - i * 80,
-      width: 100,
-      height: 20,
-    }));
+};
 
-    player.x = platforms[0].x + platforms[0].width / 2 - player.width / 2;
-    player.y = platforms[0].y - player.height;
+      let gravity = 0.26;
+      let keys: { [key: string]: boolean } = {};
+      let platforms = Array.from({ length: 10 }, (_, i) => ({
+  x: Math.random() * (canvas.width - 200), // genişliğe göre ayarla
+  y: canvas.height - i * 100,
+  width: canvas.width * 0.30,
+height: canvas.height * 0.05
 
-    let keys: { [key: string]: boolean } = {};
+}));
 
-    const handleKeyDown = (e: KeyboardEvent) => (keys[e.key] = true);
-    const handleKeyUp = (e: KeyboardEvent) => (keys[e.key] = false);
+      let score = 0;
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+      const update = () => {
+        player.vy += gravity;
+        player.y += player.vy;
 
-    const loop = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (keys['ArrowLeft']) player.x -= 5;
+        if (keys['ArrowRight']) player.x += 5;
 
-      // Move left/right
-      if (keys['ArrowLeft']) player.x -= 5;
-      if (keys['ArrowRight']) player.x += 5;
-
-      // Gravity
-      player.vy += gravity;
-      player.y += player.vy;
-
-      // Platform collision
-      for (let platform of platforms) {
-        if (
-          player.y + player.height <= platform.y + player.vy &&
-          player.y + player.height >= platform.y &&
-          player.x + player.width >= platform.x &&
-          player.x <= platform.x + platform.width &&
-          player.vy > 0
-        ) {
-          player.vy = jumpPower;
+        for (let plat of platforms) {
+          if (
+            player.y + player.height < plat.y + player.vy &&
+            player.y + player.height + player.vy >= plat.y &&
+            player.x + player.width > plat.x &&
+            player.x < plat.x + plat.width
+          ) {
+            player.vy = -13;
+          }
         }
-      }
 
-      // Scroll platforms
-      if (player.y < canvas.height / 2) {
-        const diff = canvas.height / 2 - player.y;
-        player.y = canvas.height / 2;
-        platforms.forEach(p => (p.y += diff));
-      }
+        if (player.y < 300) {
+          const dy = 300 - player.y;
+          player.y = 300;
+          platforms.forEach(p => (p.y += dy));
+          score += Math.floor(dy);
+        }
 
-      // Draw platforms
-      for (let p of platforms) {
-        ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
-      }
+        if (player.y > canvas.height) {
+          player.y = 400;
+          player.vy = 0;
+          score = 0;
+          platforms = Array.from({ length: 10 }, (_, i) => ({
+            x: Math.random() * 1000,
+            y: 800 - i * 80,
+            width: 150,
+            height: 30,
+          }));
+        }
 
-      // Draw player
-      ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+        const topY = Math.min(...platforms.map(p => p.y));
+        if (topY > 0) {
+          platforms.push({
+  x: Math.random() * (canvas.width - 200),
+  y: topY - 100,
+  width: 200,
+  height: 40
+});
 
-      // Twitter handle
-      ctx.font = '16px Arial';
-      ctx.fillStyle = 'black';
-      ctx.fillText(`@${twitterID}`, 10, 20);
+        }
+      };
 
-      requestAnimationFrame(loop);
+      const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+
+        platforms.forEach(p => {
+          ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
+        });
+
+        ctx.fillStyle = 'blue';
+        ctx.font = '20px Arial';
+        ctx.fillText(`Score: ${score}`, 20, 30);
+      };
+
+      const loop = () => {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+      };
+
+      loop();
+
+      window.addEventListener('keydown', e => (keys[e.key] = true));
+      window.addEventListener('keyup', e => (keys[e.key] = false));
     };
+  }, []);
 
-    platformImg.onload = () => {
-      playerImg.onload = loop;
-    };
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [twitterID]);
-
-  return <canvas ref={canvasRef} className="w-full h-full" />;
+  return <canvas ref={canvasRef} style={{ background: '#eee', border: '1px solid black', display: 'block', margin: '20px auto' }} />;
 };
 
 export default Game;
