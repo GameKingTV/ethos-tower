@@ -38,7 +38,7 @@ const Game = () => {
 
 };
 
-      let gravity = 0.3;
+      let gravity = 0.26;
       let keys: { [key: string]: boolean } = {};
       let platforms = Array.from({ length: 10 }, (_, i) => ({
   x: Math.random() * (canvas.width - 200), // genişliğe göre ayarla
