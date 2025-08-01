@@ -20,7 +20,7 @@ export default function Home() {
           paddingTop: '20px',
         }}
       >
-        <h1 style={{ marginRight: '10px', fontSize: '36px' }}>Ethos Tower</h1>
+        <h1 style={{ marginRight: '10px', fontSize: '36px' }}>Eth Os Tower</h1>
         <img src="/ethos-logo.png" alt="Logo" style={{ height: '75px' }} />
       </div>
 
