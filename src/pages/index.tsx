@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div
       style={{
-        backgroundColor: '#6aaefc',
+        backgroundColor: '#9bf57f',
         minHeight: '100vh',
         fontFamily: "'Comic Neue', cursive",
         position: 'relative',
