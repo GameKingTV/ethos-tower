@@ -43,8 +43,8 @@ const Game = () => {
       let platforms = Array.from({ length: 10 }, (_, i) => ({
   x: Math.random() * (canvas.width - 200), // genişliğe göre ayarla
   y: canvas.height - i * 100,
-  width: canvas.width * 0.25,
-height: canvas.height * 0.03
+  width: canvas.width * 0.30,
+height: canvas.height * 0.05
 
 }));
 
