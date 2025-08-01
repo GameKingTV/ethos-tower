@@ -1,5 +1,12 @@
 'use client';
 import { useEffect, useRef } from 'react';
+interface GameProps {
+  twitterID: string;
+}
+
+export default function Game({ twitterID }: GameProps) {
+  // ...
+}
 
 const Game = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -112,6 +119,9 @@ height: canvas.height * 0.05
         ctx.font = '20px Arial';
         ctx.fillText(`Score: ${score}`, 20, 30);
       };
+const [score, setScore] = useState(0);
+const [isGameOver, setIsGameOver] = useState(false);
+const [highScores, setHighScores] = useState<{ name: string; score: number }[]>([]);
 
       const loop = () => {
         update();
@@ -130,3 +140,19 @@ height: canvas.height * 0.05
 };
 
 export default Game;
+const handleGameOver = () => {
+  setIsGameOver(true);
+
+  const newScore = { name: twitterID, score };
+  const storedScores = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  const updatedScores = [...storedScores, newScore]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5); // En iyi 5 skoru tut
+  localStorage.setItem("leaderboard", JSON.stringify(updatedScores));
+  setHighScores(updatedScores);
+};
+const handleRestart = () => {
+  setScore(0);
+  setIsGameOver(false);
+  // oyun state'ini sıfırla (platformlar, oyuncu konumu, timer vs.)
+};
