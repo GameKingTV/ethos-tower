@@ -156,3 +156,35 @@ const handleRestart = () => {
   setIsGameOver(false);
   // oyun state'ini sıfırla (platformlar, oyuncu konumu, timer vs.)
 };
+return (
+  <div className="relative w-full h-screen bg-blue-100">
+    <div className="absolute top-4 left-4 text-xl font-bold">
+      Score: {score}
+    </div>
+
+    {isGameOver && (
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 text-white">
+        <h2 className="text-4xl font-bold mb-4">Game Over</h2>
+        <p className="mb-4">Your Score: {score}</p>
+
+        <h3 className="text-2xl mb-2">🏆 Leaderboard</h3>
+        <ul className="mb-4">
+          {highScores.map((entry, idx) => (
+            <li key={idx}>
+              {idx + 1}. {entry.name} - {entry.score}
+            </li>
+          ))}
+        </ul>
+
+        <button
+          className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
+          onClick={handleRestart}
+        >
+          Play Again
+        </button>
+      </div>
+    )}
+
+    {/* buraya oyun canvas veya karakter bileşenleri vs. */}
+  </div>
+);
