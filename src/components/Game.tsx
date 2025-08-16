@@ -45,8 +45,8 @@ const Game = () => {
     canJump: true
   };
 
-  let gravity = 0.35;
-  let jumpForce = -10;
+  let gravity = 0.1;
+  let jumpForce = -15;
   let keys: { [key: string]: boolean } = {};
 
   // Sabit geniş platform (zemin)
