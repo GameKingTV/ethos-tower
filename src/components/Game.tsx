@@ -36,7 +36,7 @@ const Game = () => {
         y: 400,
         vy: 0,
         width: canvas.width * 0.06,
-        height: canvas.width * 0.06,
+        height: canvas.width * 0.06
       };
 
       let gravity = 0.26;
@@ -44,8 +44,8 @@ const Game = () => {
       let platforms = Array.from({ length: 10 }, (_, i) => ({
         x: Math.random() * (canvas.width - 200),
         y: canvas.height - i * 100,
-        width: canvas.width * 0.3,
-        height: canvas.height * 0.05,
+        width: canvas.width * 0.30,
+        height: canvas.height * 0.05
       }));
 
       let score = 0;
@@ -71,7 +71,7 @@ const Game = () => {
         if (player.y < 300) {
           const dy = 300 - player.y;
           player.y = 300;
-          platforms.forEach((p) => (p.y += dy));
+          platforms.forEach(p => (p.y += dy));
           score += Math.floor(dy);
         }
 
@@ -80,20 +80,20 @@ const Game = () => {
           player.vy = 0;
           score = 0;
           platforms = Array.from({ length: 10 }, (_, i) => ({
-            x: Math.random() * (canvas.width - 200),
-            y: canvas.height - i * 100,
-            width: canvas.width * 0.3,
-            height: canvas.height * 0.05,
+            x: Math.random() * 1000,
+            y: 800 - i * 80,
+            width: 150,
+            height: 30,
           }));
         }
 
-        const topY = Math.min(...platforms.map((p) => p.y));
+        const topY = Math.min(...platforms.map(p => p.y));
         if (topY > 0) {
           platforms.push({
             x: Math.random() * (canvas.width - 200),
             y: topY - 100,
-            width: canvas.width * 0.3,
-            height: canvas.height * 0.05,
+            width: 200,
+            height: 40
           });
         }
       };
@@ -101,8 +101,7 @@ const Game = () => {
       const draw = () => {
         ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
         ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
-
-        platforms.forEach((p) => {
+        platforms.forEach(p => {
           ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
         });
 
@@ -119,16 +118,25 @@ const Game = () => {
 
       loop();
 
-      window.addEventListener('keydown', (e) => (keys[e.key] = true));
-      window.addEventListener('keyup', (e) => (keys[e.key] = false));
+      window.addEventListener('keydown', e => (keys[e.key] = true));
+      window.addEventListener('keyup', e => (keys[e.key] = false));
     };
   }, []);
 
- return (
-  <div className="w-screen h-screen overflow-hidden bg-black">
-    <canvas ref={canvasRef} className="w-full h-full block" />
-  </div>
-);
-
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        display: 'block',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 0,
+        width: '100vw',
+        height: '100vh',
+      }}
+    />
+  );
+};
 
 export default Game;
