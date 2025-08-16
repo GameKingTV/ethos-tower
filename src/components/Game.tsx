@@ -124,34 +124,11 @@ const Game = () => {
     };
   }, []);
 
-  return (
-    <>
-      <canvas
-        ref={canvasRef}
-        style={{
-          display: 'block',
-          width: '100vw',
-          height: '100vh',
-        }}
-      />
-      <div style={{ padding: '30px', backgroundColor: '#cbeaff' }}>
-        <h2 style={{ textAlign: 'center', fontSize: '24px', fontFamily: 'Arial' }}>
-          Oyunun Hakkında Yorum Yap:
-        </h2>
-        <textarea
-          placeholder="Düşüncelerini paylaş..."
-          style={{
-            width: '100%',
-            height: '150px',
-            fontSize: '16px',
-            padding: '10px',
-            borderRadius: '8px',
-            border: '1px solid #ccc',
-          }}
-        />
-      </div>
-    </>
-  );
-};
+ return (
+  <div className="w-screen h-screen overflow-hidden bg-black">
+    <canvas ref={canvasRef} className="w-full h-full block" />
+  </div>
+);
+
 
 export default Game;
