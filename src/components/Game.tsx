@@ -31,43 +31,69 @@ const Game = () => {
     backgroundImg.onload = onAssetLoad;
 
     const startGame = () => {
+      const platformWidth = canvas.width * 0.2;
+      const platformHeight = 20;
+
       let player = {
-        x: 100,
-        y: 400,
+        x: canvas.width / 2 - 30,
+        y: canvas.height - 100 - 60,
         vy: 0,
-        width: canvas.width * 0.06,
-        height: canvas.width * 0.06
+        width: 60,
+        height: 60,
+        canJump: true
       };
 
-      let gravity = 0.26;
+      let gravity = 0.4;
+      let jumpForce = -13;
       let keys: { [key: string]: boolean } = {};
-      let platforms = Array.from({ length: 10 }, (_, i) => ({
-        x: Math.random() * (canvas.width - 200),
-        y: canvas.height - i * 100,
-        width: canvas.width * 0.30,
-        height: canvas.height * 0.05
-      }));
+
+      // İlk sabit zemin platformu ve diğerleri
+      let platforms = [
+        { x: canvas.width / 2 - platformWidth / 2, y: canvas.height - 100, width: platformWidth, height: platformHeight }
+      ];
+
+      // Yukarıya doğru platformlar oluştur
+      for (let i = 1; i < 10; i++) {
+        platforms.push({
+          x: Math.random() * (canvas.width - platformWidth),
+          y: canvas.height - 100 - i * 100,
+          width: platformWidth,
+          height: platformHeight,
+        });
+      }
 
       let score = 0;
 
       const update = () => {
-        player.vy += gravity;
-        player.y += player.vy;
-
+        // Sağ / sol
         if (keys['ArrowLeft']) player.x -= 5;
         if (keys['ArrowRight']) player.x += 5;
 
+        // Zıplama sadece bir kere tetiklenir
+        if (keys['ArrowUp'] && player.canJump) {
+          player.vy = jumpForce;
+          player.canJump = false;
+        }
+
+        player.vy += gravity;
+        player.y += player.vy;
+
+        // Platform kontrolü
         for (let plat of platforms) {
           if (
+            player.vy > 0 &&
             player.y + player.height < plat.y + player.vy &&
             player.y + player.height + player.vy >= plat.y &&
             player.x + player.width > plat.x &&
             player.x < plat.x + plat.width
           ) {
-            player.vy = -13;
+            player.y = plat.y - player.height;
+            player.vy = 0;
+            player.canJump = true;
           }
         }
 
+        // Kamera yukarı kayar
         if (player.y < 300) {
           const dy = 300 - player.y;
           player.y = 300;
@@ -75,25 +101,33 @@ const Game = () => {
           score += Math.floor(dy);
         }
 
+        // Düştü mü?
         if (player.y > canvas.height) {
-          player.y = 400;
+          player.y = canvas.height - 100 - player.height;
           player.vy = 0;
           score = 0;
-          platforms = Array.from({ length: 10 }, (_, i) => ({
-            x: Math.random() * 1000,
-            y: 800 - i * 80,
-            width: 150,
-            height: 30,
-          }));
+
+          platforms = [
+            { x: canvas.width / 2 - platformWidth / 2, y: canvas.height - 100, width: platformWidth, height: platformHeight }
+          ];
+          for (let i = 1; i < 10; i++) {
+            platforms.push({
+              x: Math.random() * (canvas.width - platformWidth),
+              y: canvas.height - 100 - i * 100,
+              width: platformWidth,
+              height: platformHeight
+            });
+          }
         }
 
+        // Yeni platform üret
         const topY = Math.min(...platforms.map(p => p.y));
         if (topY > 0) {
           platforms.push({
-            x: Math.random() * (canvas.width - 200),
+            x: Math.random() * (canvas.width - platformWidth),
             y: topY - 100,
-            width: 200,
-            height: 40
+            width: platformWidth,
+            height: platformHeight
           });
         }
       };
@@ -101,6 +135,7 @@ const Game = () => {
       const draw = () => {
         ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
         ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+
         platforms.forEach(p => {
           ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
         });
