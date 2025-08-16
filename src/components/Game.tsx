@@ -31,8 +31,8 @@ const Game = () => {
     backgroundImg.onload = onAssetLoad;
 
    const startGame = () => {
-  const platformWidth = canvas.width * 0.2;
-  const platformHeight = 20;
+  const platformWidth = canvas.width * 0.3;
+  const platformHeight = 30;
 
   const groundHeight = 40;
 
@@ -45,8 +45,8 @@ const Game = () => {
     canJump: true
   };
 
-  let gravity = 0.4;
-  let jumpForce = -13;
+  let gravity = 0.35;
+  let jumpForce = -10;
   let keys: { [key: string]: boolean } = {};
 
   // Sabit geniş platform (zemin)
