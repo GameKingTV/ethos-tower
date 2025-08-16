@@ -8,50 +8,45 @@ const Game = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     const backgroundImg = new Image();
-backgroundImg.src = '/background.png';
+    backgroundImg.src = '/background.png';
 
     if (!canvas || !ctx) return;
 
-    canvas.width = window.innerWidth * 0.9;
-    canvas.height = window.innerHeight * 0.85;
-
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     const playerImg = new Image();
     const platformImg = new Image();
     playerImg.src = '/player.png';
     platformImg.src = '/platform.png';
 
-    // Oyunu sadece görseller yüklendiğinde başlat
     let loadedCount = 0;
-const onAssetLoad = () => {
-  loadedCount++;
-  if (loadedCount === 3) startGame(); // arka plan dahil
-};
+    const onAssetLoad = () => {
+      loadedCount++;
+      if (loadedCount === 3) startGame();
+    };
 
-playerImg.onload = onAssetLoad;
-platformImg.onload = onAssetLoad;
-backgroundImg.onload = onAssetLoad;
-
+    playerImg.onload = onAssetLoad;
+    platformImg.onload = onAssetLoad;
+    backgroundImg.onload = onAssetLoad;
 
     const startGame = () => {
       let player = {
-      x: 100,
-      y: 400,
-      vy: 0,
-      width: canvas.width * 0.06,
-      height: canvas.width * 0.06
-
-};
+        x: 100,
+        y: 400,
+        vy: 0,
+        width: canvas.width * 0.06,
+        height: canvas.width * 0.06,
+      };
 
       let gravity = 0.26;
       let keys: { [key: string]: boolean } = {};
       let platforms = Array.from({ length: 10 }, (_, i) => ({
-  x: Math.random() * (canvas.width - 200), // genişliğe göre ayarla
-  y: canvas.height - i * 100,
-  width: canvas.width * 0.30,
-height: canvas.height * 0.05
-
-}));
+        x: Math.random() * (canvas.width - 200),
+        y: canvas.height - i * 100,
+        width: canvas.width * 0.3,
+        height: canvas.height * 0.05,
+      }));
 
       let score = 0;
 
@@ -76,7 +71,7 @@ height: canvas.height * 0.05
         if (player.y < 300) {
           const dy = 300 - player.y;
           player.y = 300;
-          platforms.forEach(p => (p.y += dy));
+          platforms.forEach((p) => (p.y += dy));
           score += Math.floor(dy);
         }
 
@@ -85,42 +80,36 @@ height: canvas.height * 0.05
           player.vy = 0;
           score = 0;
           platforms = Array.from({ length: 10 }, (_, i) => ({
-            x: Math.random() * 1000,
-            y: 800 - i * 80,
-            width: 150,
-            height: 30,
+            x: Math.random() * (canvas.width - 200),
+            y: canvas.height - i * 100,
+            width: canvas.width * 0.3,
+            height: canvas.height * 0.05,
           }));
         }
 
-        const topY = Math.min(...platforms.map(p => p.y));
+        const topY = Math.min(...platforms.map((p) => p.y));
         if (topY > 0) {
           platforms.push({
-  x: Math.random() * (canvas.width - 200),
-  y: topY - 100,
-  width: 200,
-  height: 40
-});
-
+            x: Math.random() * (canvas.width - 200),
+            y: topY - 100,
+            width: canvas.width * 0.3,
+            height: canvas.height * 0.05,
+          });
         }
       };
 
       const draw = () => {
-  // Önce arka planı çiz
-  ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
 
-  // Oyuncuyu ve platformları çiz
-  ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+        platforms.forEach((p) => {
+          ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
+        });
 
-  platforms.forEach(p => {
-    ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
-  });
-
-  // Skoru yaz
-  ctx.fillStyle = 'blue';
-  ctx.font = '20px Arial';
-  ctx.fillText(`Score: ${score}`, 20, 30);
-};
-
+        ctx.fillStyle = 'blue';
+        ctx.font = '20px Arial';
+        ctx.fillText(`Score: ${score}`, 20, 30);
+      };
 
       const loop = () => {
         update();
@@ -130,13 +119,39 @@ height: canvas.height * 0.05
 
       loop();
 
-      window.addEventListener('keydown', e => (keys[e.key] = true));
-      window.addEventListener('keyup', e => (keys[e.key] = false));
+      window.addEventListener('keydown', (e) => (keys[e.key] = true));
+      window.addEventListener('keyup', (e) => (keys[e.key] = false));
     };
   }, []);
 
- return <canvas ref={canvasRef} style={{ display: 'block', margin: '20px auto' }} />;
-
+  return (
+    <>
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: 'block',
+          width: '100vw',
+          height: '100vh',
+        }}
+      />
+      <div style={{ padding: '30px', backgroundColor: '#cbeaff' }}>
+        <h2 style={{ textAlign: 'center', fontSize: '24px', fontFamily: 'Arial' }}>
+          Oyunun Hakkında Yorum Yap:
+        </h2>
+        <textarea
+          placeholder="Düşüncelerini paylaş..."
+          style={{
+            width: '100%',
+            height: '150px',
+            fontSize: '16px',
+            padding: '10px',
+            borderRadius: '8px',
+            border: '1px solid #ccc',
+          }}
+        />
+      </div>
+    </>
+  );
 };
 
 export default Game;
